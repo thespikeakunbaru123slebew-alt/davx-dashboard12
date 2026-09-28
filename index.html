@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAVX DASHBOARD PRO</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+
+        body {
+            background-color: #020205;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .galaxy-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -3;
+            background: 
+                radial-gradient(ellipse at 15% 15%, rgba(138, 43, 226, 0.28) 0%, transparent 40%),
+                radial-gradient(ellipse at 85% 85%, rgba(255, 20, 147, 0.22) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(10, 10, 35, 1) 0%, #020205 100%);
+            animation: bgShift 35s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgShift {
+            0% { transform: scale(1); filter: hue-rotate(0deg); }
+            100% { transform: scale(1.08); filter: hue-rotate(20deg); }
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -2;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #ff69b4, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 120px, #00e676, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 200px 250px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 300px 180px, #ff1493, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 350px 350px;
+            opacity: 0.6;
+            animation: twinkle 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.85; transform: scale(1.03); }
+        }
+
+        .night-sky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .shooting-star {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255,255,255,1), rgba(255, 20, 147, 0));
+            border-radius: 50%;
+            filter: drop-shadow(0 0 8px #ff69b4);
+            animation: fall cubic-bezier(0.25, 1, 0.5, 1) infinite;
+            opacity: 0;
+        }
+
+        @keyframes fall {
+            0% { transform: translateX(0) translateY(0) rotate(-45deg); opacity: 1; }
+            100% { transform: translateX(-600px) translateY(600px) rotate(-45deg); opacity: 0; }
+        }
+
+        .shooting-star:nth-child(1) { top: -10%; right: 5%; width: 120px; animation-duration: 6s; animation-delay: 1s; }
+        .shooting-star:nth-child(2) { top: 10%; right: 25%; width: 150px; animation-duration: 8s; animation-delay: 3s; }
+        .shooting-star:nth-child(3) { top: -5%; right: 55%; width: 90px; animation-duration: 5s; animation-delay: 5s; }
+
+        .touch-particle {
+            position: fixed;
+            pointer-events: none;
+            width: 8px;
+            height: 8px;
+            background: #ff69b4;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff1493, 0 0 20px #ffffff;
+            animation: particleFade 0.6s ease-out forwards;
+            z-index: 9999;
+        }
+
+        @keyframes particleFade {
+            0% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.2) translateY(15px); opacity: 0; }
+        }
+
+        .top-bar {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            left: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .top-bar > * { pointer-events: auto; }
+
+        .server-status-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+
+        .server-status {
+            background: rgba(20, 20, 25, 0.85);
+            border: 1px solid rgba(0, 230, 118, 0.4);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .server-status:hover {
+            border-color: rgba(0, 230, 118, 0.8);
+            transform: scale(1.02);
+        }
+
+        .server-dot {
+            width: 7px;
+            height: 7px;
+            background-color: #00e676;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00e676;
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(0, 230, 118, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 230, 118, 0); }
+        }
+
+        .dev-message {
+            background: rgba(20, 20, 25, 0.95);
+            border: 1px solid rgba(255, 20, 147, 0.6);
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 10px;
+            color: #dcdce6;
+            backdrop-filter: blur(5px);
+            max-width: 240px;
+            text-align: right;
+            line-height: 1.4;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+            
+            display: none;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .dev-message.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dev-message span {
+            color: #ff69b4;
+            font-weight: bold;
+        }
+
+        .bottom-left-dev {
+            position: fixed;
+            bottom: 15px;
+            left: 20px;
+            font-size: 11px;
+            color: #80808f;
+            letter-spacing: 1px;
+            z-index: 10;
+            pointer-events: none;
+            font-family: monospace;
+            background: rgba(15, 15, 20, 0.6);
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 20, 147, 0.15);
+            backdrop-filter: blur(4px);
+        }
+
+        .bottom-left-dev span {
+            color: #ff69b4;
+            font-weight: bold;
+        }
+
+        .redeem-btn {
+            background: rgba(20, 20, 25, 0.85);
+            border: 1px solid rgba(255, 20, 147, 0.5);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #ff69b4;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .card {
+            background: linear-gradient(145deg, #141419, #0d0d11);
+            padding: 30px 20px;
+            border-radius: 22px;
+            box-shadow: 0 10px 35px rgba(255, 20, 147, 0.25), inset 0 0 15px rgba(255, 20, 147, 0.08);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            border: 2px solid #ff1493;
+            position: absolute;
+            z-index: 1;
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            visibility: visible;
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease;
+        }
+
+        .card.hidden {
+            opacity: 0;
+            transform: scale(0.92) translateY(15px);
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .typing-container {
+            min-height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        h1.typing-text {
+            color: #ff69b4;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 12px rgba(255, 105, 180, 0.5);
+            border-right: 3px solid #ff69b4;
+            white-space: nowrap;
+            overflow: hidden;
+            display: inline-block;
+            animation: blinkCursor 0.8s step-end infinite;
+        }
+
+        @keyframes blinkCursor {
+            from, to { border-color: transparent; }
+            50% { border-color: #ff69b4; }
+        }
+
+        p.subtitle {
+            color: #a0a0ab;
+            font-size: 12px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 22px;
+        }
+
+        .stat-box {
+            background: #16161e;
+            border: 1px solid rgba(255, 20, 147, 0.3);
+            border-radius: 12px;
+            padding: 10px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .stat-box:hover {
+            border-color: #ff69b4;
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 15px;
+            font-weight: bold;
+            color: #00e676;
+            margin-bottom: 2px;
+            text-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
+        }
+
+        .stat-label {
+            font-size: 9px;
+            color: #90909c;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-3d {
+            position: relative;
+            display: inline-block;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #ff1493;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            outline: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 0 #b30059, 0 8px 20px rgba(255, 20, 147, 0.4);
+            text-decoration: none;
+            overflow: hidden;
+            transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.2s ease;
+        }
+
+        .btn-3d:hover { filter: brightness(1.1); }
+        .btn-3d:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #b30059, 0 3px 8px rgba(255, 20, 147, 0.3);
+        }
+
+        .ripple {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple-animation 0.35s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        .preview-box {
+            background: #16161e;
+            border: 1px solid rgba(255, 20, 147, 0.6);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 15px;
+            text-align: left;
+            max-height: 230px;
+            overflow-y: auto;
+        }
+
+        .preview-box h3 {
+            color: #ff69b4;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .preview-content {
+            font-size: 11px;
+            color: #d0d0d8;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .countdown-container {
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #ff69b4;
+            font-weight: bold;
+        }
+
+        .btn-skip {
+            background-color: #33333d;
+            box-shadow: 0 4px 0 #1d1d24;
+            width: 100%;
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 10px;
+            margin-bottom: 22px;
+        }
+
+        .product-card {
+            background: #16161e;
+            border: 1px solid rgba(255, 20, 147, 0.5);
+            border-radius: 14px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.35s ease;
+        }
+
+        .product-list.has-selection .product-card:not(.selected) {
+            filter: blur(4px);
+            opacity: 0.3;
+            pointer-events: none;
+            transform: scale(0.97);
+        }
+
+        .badge-popular {
+            position: absolute;
+            top: -10px;
+            left: 14px;
+            background: linear-gradient(90deg, #ff1493, #ff69b4);
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            box-shadow: 0 2px 8px rgba(255, 20, 147, 0.6);
+            z-index: 5;
+        }
+
+        .product-card.selected {
+            transform: scale(1.04);
+            border-color: #ff69b4;
+            background: #201322;
+            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.45);
+            z-index: 10;
+        }
+
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+        }
+
+        .product-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #00e676;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #00e676;
+        }
+
+        .product-title {
+            font-weight: bold;
+            font-size: 15px;
+            color: #ffffff;
+        }
+
+        .product-price {
+            font-size: 13px;
+            font-weight: bold;
+            color: #ff69b4;
+            margin-top: 2px;
+        }
+
+        .product-price.discounted {
+            color: #00e676;
+            text-shadow: 0 0 6px rgba(0, 230, 118, 0.4);
+        }
+
+        .original-price {
+            font-size: 10px;
+            color: #80808f;
+            text-decoration: line-through;
+            margin-right: 4px;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .btn-buy {
+            padding: 8px 14px;
+            font-size: 11px;
+            border-radius: 8px;
+            box-shadow: 0 4px 0 #b30059;
+        }
+
+        .btn-cancel-action {
+            display: none;
+            padding: 8px 10px;
+            font-size: 11px;
+            border-radius: 8px;
+            background-color: #44444d;
+            box-shadow: 0 4px 0 #222228;
+            color: #ffffff;
+        }
+
+        .product-card.selected .btn-buy {
+            background-color: #00e676;
+            box-shadow: 0 4px 0 #00a854;
+            color: #000000;
+        }
+
+        .product-card.selected .btn-cancel-action {
+            display: inline-block;
+        }
+
+        .btn-back {
+            background-color: #26262e;
+            box-shadow: 0 5px 0 #141418;
+            width: 100%;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-card {
+            background: #141419;
+            border: 2px solid #ff1493;
+            border-radius: 20px;
+            padding: 25px 20px;
+            max-width: 360px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(255, 20, 147, 0.4);
+            transform: translateY(25px) scale(0.92);
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .redeem-input {
+            width: 100%;
+            background: #1c1c26;
+            border: 1px solid rgba(255, 20, 147, 0.5);
+            padding: 12px;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 14px;
+            text-align: center;
+            text-transform: uppercase;
+            outline: none;
+            margin: 15px 0 12px 0;
+            letter-spacing: 2px;
+        }
+
+        .feedback-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 280px;
+            overflow-y: auto;
+            margin: 15px 0;
+            text-align: left;
+            padding-right: 4px;
+        }
+
+        .feedback-item {
+            background: #1c1c26;
+            border-left: 3px solid #00e676;
+            padding: 10px 12px;
+            border-radius: 8px;
+        }
+
+        .feedback-user {
+            font-size: 11px;
+            font-weight: bold;
+            color: #00e676;
+            margin-bottom: 3px;
+        }
+
+        .feedback-msg {
+            font-size: 12px;
+            color: #dcdce6;
+            line-height: 1.4;
+        }
+
+        .selected-item {
+            font-size: 15px;
+            color: #ff69b4;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .btn-socialbuzz {
+            background-color: #ff5722;
+            box-shadow: 0 4px 0 #bf360c;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 12px;
+            font-size: 11px;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .btn-whatsapp {
+            background-color: #25d366;
+            box-shadow: 0 4px 0 #128c7e;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 12px;
+            font-size: 11px;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .btn-close {
+            background-color: #33333d;
+            box-shadow: 0 4px 0 #1d1d24;
+            width: 100%;
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(50px);
+            background: rgba(0, 230, 118, 0.9);
+            color: #000000;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(0, 230, 118, 0.5);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body onclick="handleGlobalClick(event)" onpointermove="createTouchParticle(event)">
+
+    <div class="top-bar">
+        <button class="redeem-btn" onclick="bukaModalRedeem(event)">
+            🎁 REDEEM CODE
+        </button>
+        <div class="server-status-group">
+            <div class="server-status" onclick="toggleDevMessage(event)">
+                <span class="server-dot"></span>
+                <span>DAVX SERVER ONLINE</span>
+            </div>
+            <div class="dev-message" id="devMessageBox">
+                <span>PESAN DEV</span><br>
+                ada kendala saat pembayaran? hubungi admin -> 6285138448894
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-left-dev">
+        DEV : <span>diperdi</span>
+    </div>
+
+    <div class="galaxy-bg"></div>
+    <div class="stars"></div>
+    <div class="night-sky">
+        <div class="shooting-star"></div>
+        <div class="shooting-star"></div>
+        <div class="shooting-star"></div>
+    </div>
+
+    <div class="toast" id="toastMsg">Berhasil disalin!</div>
+
+    <!-- Halaman Utama / Home -->
+    <div class="card" id="homeCard">
+        <div class="typing-container">
+            <h1 class="typing-text" id="typingTitle"></h1>
+        </div>
+        <p class="subtitle">DAVX OPTIMIZATION SYSTEM</p>
+        
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-value" id="statUsers">0</div>
+                <div class="stat-label">Users</div>
+            </div>
+            <div class="stat-box" onclick="bukaModalListTestimoni(event)">
+                <div class="stat-value" id="statFeedback">0</div>
+                <div class="stat-label">Feedback 💬</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="statRating">0</div>
+                <div class="stat-label">Rating</div>
+            </div>
+        </div>
+
+        <button class="btn-3d" onclick="bukaMenu(event)">START</button>
+    </div>
+
+    <!-- Halaman Preview -->
+    <div class="card hidden" id="previewCard">
+        <h1>INFO MODULE</h1>
+        <div class="preview-box">
+            <h3>FITUR² MODULE DAVX</h3>
+            <div class="preview-content">
+🟢 DVX BASIC (59 fitur) - Rp 3.000
+✅ RAM Cleaner & Storage Cleaner
+✅ CPU & GPU Boost
+✅ Touch Optimizer & Headtrick
+
+🔵 DVX VIP (92 fitur) - Rp 5.000
+✅ Semua fitur BASIC + I/O Scheduler
+
+🟠 DVX EXTREME (138 fitur) - Rp 8.000
+✅ Semua fitur VIP + Kernel Tweak
+
+🟣 DVX EXCLUSIVE (200 fitur) - Rp 10.000
+✅ Semua fitur EXTREME + Battery Health
+
+🔴 DVX ULTIMATE (303 fitur) - Rp 15.000
+✅ Full Game Booster & Network Turbo
+            </div>
+        </div>
+        <div class="countdown-container" id="countdownText">
+            Masuk ke katalog dalam <span id="timerNum">20</span> detik...
+        </div>
+        <button class="btn-3d btn-skip" onclick="skipPreview(event)">SKIP</button>
+    </div>
+
+    <!-- Halaman Katalog Modul -->
+    <div class="card hidden" id="menuCard">
+        <h1>LIST MODULE DAVX</h1>
+        <p class="subtitle" id="katalogSubtitle">Pilih paket modul yang Anda butuhkan</p>
+        
+        <div class="product-list" id="productList">
+            <div class="product-card" onclick="pilihModul(event, this, 'BASIC', 3000)">
+                <div class="product-info">
+                    <div class="product-header">
+                        <span class="status-dot"></span>
+                        <span class="product-title">BASIC</span>
+                    </div>
+                    <span class="product-price" id="price-BASIC">Rp 3.000</span>
+                </div>
+                <div class="action-btns">
+                    <button class="btn-3d btn-cancel-action" onclick="batalPilihan(event)">BATAL</button>
+                    <button class="btn-3d btn-buy">BELI</button>
+                </div>
+            </div>
+
+            <div class="product-card" onclick="pilihModul(event, this, 'VIP', 5000)">
+                <div class="product-info">
+                    <div class="product-header">
+                        <span class="status-dot"></span>
+                        <span class="product-title">VIP</span>
+                    </div>
+                    <span class="product-price" id="price-VIP">Rp 5.000</span>
+                </div>
+                <div class="action-btns">
+                    <button class="btn-3d btn-cancel-action" onclick="batalPilihan(event)">BATAL</button>
+                    <button class="btn-3d btn-buy">BELI</button>
+                </div>
+            </div>
+
+            <div class="product-card" onclick="pilihModul(event, this, 'EXTREME', 8000)">
+                <span class="badge-popular">POPULER</span>
+                <div class="product-info">
+                    <div class="product-header">
+                        <span class="status-dot"></span>
+                        <span class="product-title">EXTREME</span>
+                    </div>
+                    <span class="product-price" id="price-EXTREME">Rp 8.000</span>
+                </div>
+                <div class="action-btns">
+                    <button class="btn-3d btn-cancel-action" onclick="batalPilihan(event)">BATAL</button>
+                    <button class="btn-3d btn-buy">BELI</button>
+                </div>
+            </div>
+
+            <div class="product-card" onclick="pilihModul(event, this, 'EXCLUSIVE', 10000)">
+                <div class="product-info">
+                    <div class="product-header">
+                        <span class="status-dot"></span>
+                        <span class="product-title">EXCLUSIVE</span>
+                    </div>
+                    <span class="product-price" id="price-EXCLUSIVE">Rp 10.000</span>
+                </div>
+                <div class="action-btns">
+                    <button class="btn-3d btn-cancel-action" onclick="batalPilihan(event)">BATAL</button>
+                    <button class="btn-3d btn-buy">BELI</button>
+                </div>
+            </div>
+
+            <div class="product-card" onclick="pilihModul(event, this, 'ULTIMATE', 15000)">
+                <span class="badge-popular" style="background: linear-gradient(90deg, #00e676, #00b0ff);">BEST SELLER</span>
+                <div class="product-info">
+                    <div class="product-header">
+                        <span class="status-dot"></span>
+                        <span class="product-title">ULTIMATE</span>
+                    </div>
+                    <span class="product-price" id="price-ULTIMATE">Rp 15.000</span>
+                </div>
+                <div class="action-btns">
+                    <button class="btn-3d btn-cancel-action" onclick="batalPilihan(event)">BATAL</button>
+                    <button class="btn-3d btn-buy">BELI</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-3d btn-back" id="btnBack" onclick="kembaliUtama(event)">KEMBALI</button>
+    </div>
+
+    <!-- Modal Redeem Code -->
+    <div class="modal-overlay" id="redeemModal" onclick="tutupModalDariOverlay(event, 'redeemModal')">
+        <div class="modal-card">
+            <h1>REDEEM CODE</h1>
+            <p class="subtitle" style="margin-bottom: 5px;">Masukkan kode pemenang khusus</p>
+            
+            <input type="text" id="redeemCodeInput" class="redeem-input" placeholder="CONTOH: REDEEMCD">
+
+            <button class="btn-3d btn-socialbuzz" style="background-color: #ff1493; box-shadow: 0 4px 0 #b30059;" onclick="prosesRedeem(event)">KLAIM KODE</button>
+            <button class="btn-3d btn-close" onclick="tutupModal('redeemModal')">TUTUP</button>
+        </div>
+    </div>
+
+    <!-- Modal Pembayaran (Checkout) -->
+    <div class="modal-overlay" id="paymentModal" onclick="tutupModalDariOverlay(event, 'paymentModal')">
+        <div class="modal-card">
+            <h1>CHECKOUT</h1>
+            <p class="selected-item" id="itemDetail">PAKET - RP 0</p>
+            
+            <button class="btn-3d btn-socialbuzz" onclick="bayarKeSociaBuzz(event)">
+                BAYAR VIA SOCIALBUZZ
+            </button>
+            
+            <button class="btn-3d btn-whatsapp" onclick="konfirmasiKeWhatsApp(event)">
+                CONFIRM PEMBAYARAN VIA WHATSAPP
+            </button>
+            
+            <button class="btn-3d btn-close" onclick="tutupModal('paymentModal')">BATALKAN</button>
+        </div>
+    </div>
+
+    <!-- Modal Testimoni -->
+    <div class="modal-overlay" id="feedbackModal" onclick="tutupModalDariOverlay(event, 'feedbackModal')">
+        <div class="modal-card">
+            <h1>TESTIMONI USER</h1>
+            <p class="subtitle" style="margin-bottom: 5px;">TESTI GACOR & WORK 100% 🔥</p>
+            
+            <div class="feedback-list">
+                <div class="feedback-item">
+                    <div class="feedback-user">user 322</div>
+                    <div class="feedback-msg">gacor bang gelooo, HP adem ayem pas dipakai rata kanan wkwk! 🔥</div>
+                </div>
+                <div class="feedback-item">
+                    <div class="feedback-user">user 299</div>
+                    <div class="feedback-msg">mantap bang semangattt, work pol di device gw gak ada obat licinnya ⚡</div>
+                </div>
+                <div class="feedback-item">
+                    <div class="feedback-user">user 412</div>
+                    <div class="feedback-msg">Awalnya ragu, pas coba versi Ultimate langsung libas semua game tanpa patah-patah. Top markotop! 🚀</div>
+                </div>
+                <div class="feedback-item">
+                    <div class="feedback-user">user 180</div>
+                    <div class="feedback-msg">Respon admin cepat, modulnya beneran work dan kerasa banget bedanya pas mabar. Mantap jiwa! 💯</div>
+                </div>
+                <div class="feedback-item">
+                    <div class="feedback-user">user 505</div>
+                    <div class="feedback-msg">Gila sih ini, touch response jadi makin licin parah. Recommended banget buat user kentang! ⚡🔥</div>
+                </div>
+                <div class="feedback-item">
+                    <div class="feedback-user">user 087</div>
+                    <div class="feedback-msg">Batre jadi lebih stabil dan ga gampang panas pas Push Rank lama. Thanks dev! 👍</div>
+                </div>
+            </div>
+
+            <button class="btn-3d btn-close" onclick="tutupModal('feedbackModal')">TUTUP</button>
+        </div>
+    </div>
+
+    <script>
+        const linkSociaBuzz = "https://sociabuzz.com/davx_module/tribe"; 
+        const nomorWhatsApp = "6285138448894";
+
+        let countdownInterval = null;
+        let isTransitioning = false;
+        let lastParticleTime = 0;
+        let audioCtx = null;
+        let selectedPackageName = "";
+        let selectedPackagePrice = "";
+        let isDiscountActive = false; 
+
+        const databaseKodeRedeem = {
+            "REDEEMCD": "active"
+        };
+
+        const basePrices = {
+            'BASIC': 3000,
+            'VIP': 5000,
+            'EXTREME': 8000,
+            'EXCLUSIVE': 10000,
+            'ULTIMATE': 15000
+        };
+
+        const textToType = "DAVX MODULE";
+        let charIndex = 0;
+
+        function startTypingEffect() {
+            const typingElement = document.getElementById("typingTitle");
+            if (!typingElement) return;
+
+            if (charIndex < textToType.length) {
+                typingElement.textContent += textToType.charAt(charIndex);
+                charIndex++;
+                setTimeout(startTypingEffect, 220);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            animateCounters();
+            startTypingEffect();
+        });
+
+        function toggleDevMessage(e) {
+            e.stopPropagation();
+            triggerHaptic();
+            playSound('click');
+            const devMsg = document.getElementById('devMessageBox');
+            if (devMsg) {
+                devMsg.classList.toggle('show');
+            }
+        }
+
+        function playSound(type) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(450, now);
+                    osc.frequency.exponentialRampToValueAtTime(150, now + 0.08);
+                    gainNode.gain.setValueAtTime(0.12, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                    osc.start(now); osc.stop(now + 0.08);
+                } else if (type === 'success') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.setValueAtTime(600, now + 0.08);
+                    gainNode.gain.setValueAtTime(0.15, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.start(now); osc.stop(now + 0.25);
+                }
+            } catch (e) {}
+        }
+
+        function triggerHaptic() {
+            if (window.navigator && window.navigator.vibrate) {
+                try { navigator.vibrate(15); } catch (e) {}
+            }
+        }
+
+        function animateCounters() {
+            const duration = 1500;
+            const steps = 40;
+            const stepTime = duration / steps;
+            const targets = [
+                { id: 'statUsers', end: 724, prefix: '', isFloat: false },
+                { id: 'statFeedback', end: 385, prefix: '', isFloat: false },
+                { id: 'statRating', end: 4.9, prefix: '★ ', isFloat: true }
+            ];
+
+            targets.forEach(target => {
+                let current = 0;
+                let currentStep = 0;
+                const increment = target.end / steps;
+                const elem = document.getElementById(target.id);
+                if (!elem) return;
+
+                const timer = setInterval(() => {
+                    currentStep++;
+                    current += increment;
+                    if (currentStep >= steps) {
+                        current = target.end;
+                        clearInterval(timer);
+                    }
+                    elem.innerText = target.isFloat ? target.prefix + current.toFixed(1) : target.prefix + Math.floor(current).toLocaleString();
+                }, stepTime);
+            });
+        }
+
+        function createTouchParticle(e) {
+            const now = Date.now();
+            if (now - lastParticleTime < 40) return;
+            lastParticleTime = now;
+
+            const particle = document.createElement('span');
+            particle.className = 'touch-particle';
+            particle.style.left = `${e.clientX - 4}px`;
+            particle.style.top = `${e.clientY - 4}px`;
+            document.body.appendChild(particle);
+            setTimeout(() => { particle.remove(); }, 600);
+        }
+
+        function createRipple(event) {
+            triggerHaptic();
+            playSound('click');
+            const button = event.currentTarget;
+            if (!button) return;
+            
+            const circle = document.createElement("span");
+            const diameter = Math.min(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+            const rect = button.getBoundingClientRect();
+            
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - rect.left - radius}px`;
+            circle.style.top = `${event.clientY - rect.top - radius}px`;
+            circle.classList.add("ripple");
+
+            const existingRipple = button.getElementsByClassName("ripple")[0];
+            if (existingRipple) existingRipple.remove();
+
+            button.appendChild(circle);
+            setTimeout(() => { circle.remove(); }, 350);
+        }
+
+        function showToast(text) {
+            const toast = document.getElementById('toastMsg');
+            if (!toast) return;
+            toast.innerText = text;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 2000);
+        }
+
+        function bukaMenu(e) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+            createRipple(e);
+
+            document.getElementById('homeCard').classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('previewCard').classList.remove('hidden');
+                mulaiHitungMundur();
+                isTransitioning = false;
+            }, 350);
+        }
+
+        function mulaiHitungMundur() {
+            let timeLeft = 20;
+            const timerElem = document.getElementById('timerNum');
+            if (timerElem) timerElem.innerText = timeLeft;
+
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                if (timerElem) timerElem.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    transisiKeMenuUtama();
+                }
+            }, 1000);
+        }
+
+        function skipPreview(e) {
+            if (isTransitioning) return;
+            createRipple(e);
+            clearInterval(countdownInterval);
+            transisiKeMenuUtama();
+        }
+
+        function transisiKeMenuUtama() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            document.getElementById('previewCard').classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('menuCard').classList.remove('hidden');
+                isTransitioning = false;
+            }, 350);
+        }
+
+        function kembaliUtama(e) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+            createRipple(e);
+            resetPilihan();
+            clearInterval(countdownInterval);
+
+            document.getElementById('menuCard').classList.add('hidden');
+            document.getElementById('previewCard').classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('homeCard').classList.remove('hidden');
+                isTransitioning = false;
+            }, 350);
+        }
+
+        function updateHargaTampilan() {
+            for (let key in basePrices) {
+                const priceElem = document.getElementById('price-' + key);
+                if (!priceElem) continue;
+
+                if (isDiscountActive) {
+                    const original = basePrices[key];
+                    const discounted = Math.round(original * 0.65); 
+                    priceElem.innerHTML = `<span class="original-price">Rp ${original.toLocaleString()}</span> Rp ${discounted.toLocaleString()}`;
+                    priceElem.classList.add('discounted');
+                } else {
+                    priceElem.innerText = `Rp ${basePrices[key].toLocaleString()}`;
+                    priceElem.classList.remove('discounted');
+                }
+            }
+
+            const subtitleElem = document.getElementById('katalogSubtitle');
+            if (subtitleElem) {
+                if (isDiscountActive) {
+                    subtitleElem.innerHTML = '<span style="color: #00e676; font-weight: bold;">🎉 KODE PEMENANG AKTIF: Diskon Spesial 35% OFF!</span>';
+                } else {
+                    subtitleElem.innerHTML = 'Pilih paket modul yang Anda butuhkan';
+                }
+            }
+        }
+
+        function pilihModul(e, cardElement, nama, baseHarga) {
+            e.stopPropagation();
+            const isAlreadySelected = cardElement.classList.contains('selected');
+
+            let hargaFinalNum = isDiscountActive ? Math.round(baseHarga * 0.65) : baseHarga;
+            let hargaFinalStr = "Rp " + hargaFinalNum.toLocaleString();
+
+            if (isAlreadySelected) {
+                bukaModalPembayaran(nama, hargaFinalStr);
+            } else {
+                triggerHaptic();
+                playSound('success');
+                resetPilihan();
+                cardElement.classList.add('selected');
+                
+                document.getElementById('productList').classList.add('has-selection');
+                document.getElementById('btnBack').classList.add('blurred');
+
+                const btn = cardElement.querySelector('.btn-buy');
+                if (btn) btn.innerText = "KONFIRMASI";
+            }
+        }
+
+        function batalPilihan(e) {
+            e.stopPropagation();
+            createRipple(e);
+            resetPilihan();
+        }
+
+        function resetPilihan() {
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.classList.remove('selected');
+                const btn = card.querySelector('.btn-buy');
+                if (btn) btn.innerText = "BELI";
+            });
+
+            document.getElementById('productList').classList.remove('has-selection');
+            const btnBack = document.getElementById('btnBack');
+            if (btnBack) btnBack.classList.remove('blurred');
+        }
+
+        function handleGlobalClick(e) {
+            if (!e.target.closest('.server-status-group') && !e.target.closest('.product-card') && !e.target.closest('.modal-card') && !e.target.closest('.stat-box') && !e.target.closest('.redeem-btn')) {
+                resetPilihan();
+                const devMsg = document.getElementById('devMessageBox');
+                if (devMsg) devMsg.classList.remove('show');
+            }
+        }
+
+        function bukaModalRedeem(e) {
+            e.stopPropagation();
+            triggerHaptic();
+            playSound('click');
+            document.getElementById('redeemCodeInput').value = "";
+            document.getElementById('redeemModal').classList.add('active');
+        }
+
+        function prosesRedeem(e) {
+            createRipple(e);
+            const inputVal = document.getElementById('redeemCodeInput').value.trim().toUpperCase();
+
+            if (inputVal === "") {
+                showToast("Masukkan kode terlebih dahulu!");
+                return;
+            }
+
+            if (!(inputVal in databaseKodeRedeem)) {
+                playSound('click');
+                showToast("Kode tidak valid / salah");
+                return;
+            }
+
+            const statusKode = databaseKodeRedeem[inputVal];
+
+            if (statusKode === "used") {
+                playSound('click');
+                showToast("Kode sudah digunakan orang lain (Habis)!");
+            } else if (statusKode === "active") {
+                playSound('success');
+                showToast("Selamat! Diskon 35% Khusus Pemenang Aktif! 🎉");
+                databaseKodeRedeem[inputVal] = "used"; 
+                isDiscountActive = true;
+                updateHargaTampilan();
+                tutupModal('redeemModal');
+            }
+        }
+
+        function bukaModalPembayaran(nama, hargaStr) {
+            triggerHaptic();
+            playSound('success');
+            selectedPackageName = nama;
+            selectedPackagePrice = hargaStr;
+            
+            document.getElementById('itemDetail').innerText = 'PAKET ' + nama + ' - ' + hargaStr;
+            document.getElementById('paymentModal').classList.add('active');
+        }
+
+        function bayarKeSociaBuzz(e) {
+            createRipple(e);
+            
+            // DISKON OTOMATIS HILANG SETELAH MELAKUKAN PEMBELIAN
+            isDiscountActive = false;
+            updateHargaTampilan();
+            resetPilihan();
+            tutupModal('paymentModal');
+
+            window.open(linkSociaBuzz, '_blank');
+        }
+
+        function konfirmasiKeWhatsApp(e) {
+            createRipple(e);
+            const pesan = `Halo Davx, saya pemenang kode redeem khusus dan ingin konfirmasi pembayaran untuk paket ${selectedPackageName} seharga ${selectedPackagePrice}.\n\n*WAJIB SERTAKAN BUKTI TF❗`;
+            const urlWA = `https://wa.me/${nomorWhatsApp}?text=${encodeURIComponent(pesan)}`;
+            
+            // DISKON OTOMATIS HILANG SETELAH MELAKUKAN PEMBELIAN
+            isDiscountActive = false;
+            updateHargaTampilan();
+            resetPilihan();
+            tutupModal('paymentModal');
+
+            window.open(urlWA, '_blank');
+        }
+
+        function bukaModalListTestimoni(e) {
+            e.stopPropagation();
+            triggerHaptic();
+            playSound('click');
+            document.getElementById('feedbackModal').classList.add('active');
+        }
+
+        function tutupModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            if (modalId === 'paymentModal') resetPilihan();
+        }
+
+        function tutupModalDariOverlay(e, modalId) {
+            if (e.target.id === modalId) {
+                triggerHaptic();
+                tutupModal(modalId);
+            }
+        }
+    </script>
+</body>
+</html>
